@@ -1,3 +1,4 @@
 streamlit
 groq
 googlesearch-python
+pandas
