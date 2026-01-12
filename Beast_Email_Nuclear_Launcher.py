@@ -8,14 +8,14 @@ import re
 import time
 import uuid
 
-# --- 🔐 إعدادات الأمان والربط مع الوحش ---
+# --- 🔐 إعدادات الربط (Secrets) ---
 try:
     client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 except:
-    st.error("⚠️ GROQ_API_KEY is missing in Streamlit Secrets!")
+    st.error("⚠️ GROQ_API_KEY missing in Streamlit Secrets!")
 
-# --- 🎨 تصميم واجهة الوحش (Beast UI) ---
-st.set_page_config(page_title="BEAST EMAIL SNIPER V2", layout="wide")
+# --- 🎨 واجهة الوحش (Beast UI Customization) ---
+st.set_page_config(page_title="BEAST EMAIL SNIPER V2.1", layout="wide")
 
 st.markdown("""
     <style>
@@ -28,126 +28,118 @@ st.markdown("""
     }
     .stButton>button:hover { transform: scale(1.02); box-shadow: 0 0 15px #d4af37; }
     h1, h2, h3 { color: #d4af37 !important; font-family: 'Inter', sans-serif; }
-    .stTextInput>div>div>input { background-color: #111 !important; color: white !important; }
+    .stTextInput>div>div>input { background-color: #111 !important; color: white !important; border: 1px solid #333; }
+    .stTextArea>div>div>textarea { background-color: #111 !important; color: white !important; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🎯 Beast Email Sniper & AI Launcher V2")
+st.title("🎯 Beast Email Sniper & AI Launcher V2.1")
 
-# --- 🛡️ Command Center (Sidebar) ---
-st.sidebar.header("🕹️ Control Panel")
-smtp_user = st.sidebar.text_input("Sender Gmail (SMTP)", placeholder="example@gmail.com")
-smtp_pass = st.sidebar.text_input("App Password", type="password", help="Get this from Google Account > Security > App Passwords")
+# --- 🛡️ Control Panel (Sidebar) ---
+st.sidebar.header("🕹️ Command Center")
+smtp_user = st.sidebar.text_input("Sender Gmail (SMTP)", placeholder="yourname@gmail.com")
+smtp_pass = st.sidebar.text_input("App Password", type="password", help="Use 'App Password' from Google Security settings.")
 st.sidebar.markdown("---")
-st.sidebar.warning("🛡️ Safety Tip: Send max 50-100 emails/day to keep your account safe.")
+st.sidebar.write("System Status: **Ready to Hunt** ☢️")
 
-# --- 📑 الأقسام الرئيسية (Tabs) ---
-tabs = st.tabs(["🔎 Lead Sniper", "🤖 AI Content Architect", "🚀 Launch Missile", "📊 Tracking Intelligence"])
+# --- 📑 الأقسام (Tabs) ---
+tabs = st.tabs(["🔎 Lead Sniper", "🤖 AI Content Architect", "🚀 Launch Missile", "📊 Intelligence"])
 
-# --- 1. القسم الأول: صيد الإيميلات (Sniper) ---
+# --- 1. Lead Sniper (المعدل والمصلح) ---
 with tabs[0]:
     st.header("🔎 Web Target Hunting")
     col1, col2 = st.columns(2)
     with col1:
-        niche = st.text_input("Industry / Niche", placeholder="e.g. Roofers, Agency Owners")
+        niche = st.text_input("Industry / Niche", value="Spiritual Coaches")
     with col2:
-        target_domain = st.selectbox("Email Provider", ["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com"])
+        target_domain = st.selectbox("Email Domain", ["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com"])
     
     if st.button("Start Hunting for Emails"):
-        # منطق الـ Google Dorking المتقدم
-        query = f'site:facebook.com OR site:instagram.com OR site:linkedin.com "{niche}" "{target_domain}"'
-        with st.spinner("Scouring social platforms for public emails..."):
-            results = []
-            for url in search(query, num=15, stop=15, pause=2):
-                results.append(url)
-            
-            st.success(f"Found {len(results)} high-potential source links!")
-            for link in results:
-                st.markdown(f"🔗 [Potential Lead Source]({link})")
-            st.info("💡 Copy the emails from these pages and paste them in the Launcher tab.")
+        # صيغة Dorking احترافية
+        query = f'site:instagram.com OR site:facebook.com "{niche}" "{target_domain}"'
+        with st.spinner("Scouring social platforms for public leads..."):
+            try:
+                # الإصلاح: استخدام num_results بدلاً من num/stop لتفادي TypeError
+                search_results = search(query, num_results=15)
+                
+                results_links = []
+                for url in search_results:
+                    results_links.append(url)
+                
+                if results_links:
+                    st.success(f"Found {len(results_links)} high-potential source links!")
+                    for link in results_links:
+                        st.markdown(f"🔗 [Lead Source]({link})")
+                    st.info("💡 Open links and copy public emails into the 'Launch' tab.")
+                else:
+                    st.warning("No public results found. Try changing the niche or domain.")
+            except Exception as e:
+                st.error(f"Search Module Error: {e}")
 
-# --- 2. القسم الثاني: هندسة المحتوى بـ AI ---
+# --- 2. AI Content Architect ---
 with tabs[1]:
     st.header("🤖 AI Email Copywriter")
-    target_description = st.text_input("Describe your target audience precisely")
-    value_prop = st.text_area("What is your unique offer / value proposition?")
+    target_info = st.text_input("Who are you messaging? (e.g., Coaches wanting more clients)")
+    offer_detail = st.text_area("Your Offer (e.g., Free Strategy Session, AI Ads Service)")
     
     if st.button("Generate Atomic Email Copy"):
-        with st.spinner("Groq AI is analyzing psychology..."):
-            prompt = f"""
-            You are a world-class cold email specialist. 
-            Write a high-converting, short, and punchy cold email for: {target_description}.
-            Our Offer: {value_prop}.
-            Style: Bold, Professional, Curious. No spammy words.
-            """
+        with st.spinner("AI is crafting the message..."):
+            prompt = f"Write a world-class cold email for {target_info}. Our offer: {offer_detail}. Keep it bold, short, and high-converting."
             res = client.chat.completions.create(messages=[{"role": "user", "content": prompt}], model="llama-3.3-70b-versatile")
             st.session_state['ai_email_body'] = res.choices[0].message.content
             st.success("Email Content Ready!")
             st.markdown("---")
             st.write(st.session_state['ai_email_body'])
 
-# --- 3. القسم الثالث: الإطلاق (Launcher) ---
+# --- 3. Launch Missile ---
 with tabs[2]:
     st.header("🚀 Nuclear Launch System")
     target_emails = st.text_area("Paste Target Emails (one per line)")
     email_subject = st.text_input("Email Subject Line")
     
-    track_option = st.checkbox("Embed Tracking Pixel (Identify Opens)", value=True)
+    track_option = st.checkbox("Embed Tracking Pixel", value=True)
     
     if st.button("FIRE ALL MISSILES"):
-        # تنظيف القائمة باستخدام Regex
+        # تصفية الإيميلات
         clean_list = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', target_emails)
         
         if not clean_list:
-            st.error("No valid emails found in the list!")
+            st.error("No valid emails detected!")
         elif not smtp_user or not smtp_pass:
-            st.error("Please setup SMTP in the sidebar first!")
+            st.error("Set up SMTP in the sidebar first!")
         else:
             try:
-                # الاتصال بسيرفر جوجل
                 server = smtplib.SMTP("smtp.gmail.com", 587)
                 server.starttls()
                 server.login(smtp_user, smtp_pass)
                 
-                progress_bar = st.progress(0)
-                for i, target_email in enumerate(clean_list):
+                progress = st.progress(0)
+                for i, email in enumerate(clean_list):
                     msg = MIMEMultipart()
                     msg['From'] = smtp_user
-                    msg['To'] = target_email
+                    msg['To'] = email
                     msg['Subject'] = email_subject
                     
-                    # صياغة الرسالة مع بيكسل التتبع
-                    content = st.session_state.get('ai_email_body', "Hello, checking in...")
+                    body = st.session_state.get('ai_email_body', "Hello, I have something for you.")
                     if track_option:
-                        track_id = str(uuid.uuid4())
-                        # رابط وهمي للتتبع (يحتاج سيرفر للاشتغال الحقيقي)
-                        tracking_pixel = f'<img src="https://your-server.com/track/{track_id}.png" width="1" height="1" style="display:none;" />'
-                        content += tracking_pixel
+                        body += f'<br><img src="https://your-tracking.com/pixel.png?id={uuid.uuid4()}" width="1" height="1" style="display:none;"/>'
                     
-                    msg.attach(MIMEText(content, 'html'))
+                    msg.attach(MIMEText(body, 'html'))
                     server.send_message(msg)
-                    
-                    st.write(f"🚀 Sent to: {target_email}")
-                    progress_bar.progress((i + 1) / len(clean_list))
-                    time.sleep(3) # فجوة أمان لعدم حظر الحساب
+                    st.write(f"🚀 Missile sent to: {email}")
+                    progress.progress((i + 1) / len(clean_list))
+                    time.sleep(3) # أمان لتفادي السبام
                 
                 server.quit()
-                st.success(f"Mission Accomplished! {len(clean_list)} emails sent.")
+                st.success("Campaign Finished Successfully!")
             except Exception as e:
-                st.error(f"Launch Failed: {e}")
+                st.error(f"Launch Error: {e}")
 
-# --- 4. القسم الرابع: التتبع والاستخبارات ---
+# --- 4. Intelligence ---
 with tabs[3]:
-    st.header("📊 Intelligence & Tracking")
-    render_beast_card = """
-    <div style="background: #111; padding: 20px; border-radius: 15px; border: 1px solid #d4af37; text-align: center;">
-        <h3 style="margin:0;">Email Open Rate</h3>
-        <h1 style="color: #d4af37; font-size: 3em;">-- %</h1>
-        <p>Real-time tracking requires a hosted backend (Flask/FastAPI).</p>
-    </div>
-    """
-    st.components.v1.html(render_beast_card, height=200)
-    st.info("The tracking pixel is working. To see live data, you must link this app to a logging database.")
+    st.header("📊 Intelligence Report")
+    st.write("Real-time open tracking would appear here if linked to a live backend server.")
+    st.info("The system is currently tagging each email with a unique tracking ID.")
 
 st.sidebar.markdown("---")
-st.sidebar.info("Beast Sniper V2.0 - Developed for Marketing Legends")
+st.sidebar.write("🦁 **Beast Mode: Active**")
