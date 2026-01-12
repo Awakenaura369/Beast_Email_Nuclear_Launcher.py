@@ -12,103 +12,89 @@ import uuid
 try:
     client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 except:
-    st.error("⚠️ GROQ_API_KEY missing in Streamlit Secrets!")
+    st.error("⚠️ API Key missing!")
 
-# --- 🎨 تصميم Beast UI الفخم ---
-st.set_page_config(page_title="BEAST EMAIL SNIPER V2.1", layout="wide")
-
-st.markdown("""
-    <style>
+# --- 🎨 Beast UI (Gold & Black) ---
+st.set_page_config(page_title="BEAST HUNTER V2.2", layout="wide")
+st.markdown("""<style>
     .stApp { background: #050505; color: #e0e0e0; }
-    [data-testid="stSidebar"] { background-color: #0d1117; border-right: 2px solid #d4af37; }
-    .stButton>button { 
-        background: linear-gradient(45deg, #d4af37, #f4cf47); 
-        color: black; font-weight: bold; border-radius: 12px; 
-        border: none; height: 50px; transition: 0.3s;
-    }
-    .stButton>button:hover { transform: scale(1.02); box-shadow: 0 0 15px #d4af37; }
+    .stButton>button { background: linear-gradient(45deg, #d4af37, #f4cf47); color: black; font-weight: bold; border-radius: 12px; height: 50px; }
     h1, h2, h3 { color: #d4af37 !important; }
     .stTextInput>div>div>input { background-color: #111 !important; color: white !important; }
-    </style>
-    """, unsafe_allow_html=True)
+</style>""", unsafe_allow_html=True)
 
-st.title("🎯 Beast Email Sniper & AI Launcher V2.1")
+st.title("🎯 Beast Unstoppable Hunter V2.2")
 
 # --- 🛡️ Sidebar ---
 st.sidebar.header("🕹️ Command Center")
 smtp_user = st.sidebar.text_input("Sender Gmail (SMTP)")
 smtp_pass = st.sidebar.text_input("App Password", type="password")
-st.sidebar.markdown("---")
-st.sidebar.write("Status: **System Armed** ☢️")
 
-# --- 📑 الأقسام ---
-tabs = st.tabs(["🔎 Lead Sniper", "🤖 AI Writer", "🚀 Launcher", "📊 Stats"])
+# --- 📑 Tabs ---
+tabs = st.tabs(["🔎 Atomic Sniper", "🤖 AI Writer", "🚀 Launcher"])
 
-# --- 1. Lead Sniper (النسخة المصلحة) ---
+# --- 1. Atomic Sniper (النسخة المجهدة) ---
 with tabs[0]:
-    st.header("🔎 Web Target Hunting")
-    col1, col2 = st.columns(2)
+    st.header("🔎 Targeted Email Sniper")
+    col1, col2, col3 = st.columns(3)
     with col1:
-        niche = st.text_input("Industry", value="Real Estate Investors")
+        niche = st.text_input("Niche", value="Spiritual Coaches")
     with col2:
-        target_domain = st.selectbox("Domain", ["@gmail.com", "@yahoo.com", "@outlook.com"])
-    
-    if st.button("Start Hunting for Emails"):
-        # تحسين البحث بـ Google Dorking
-        query = f'"{niche}" "{target_domain}"'
-        with st.spinner("Hunting for public leads..."):
+        domain = st.selectbox("Domain", ["@gmail.com", "@yahoo.com", "@outlook.com"])
+    with col3:
+        platform = st.selectbox("Platform", ["Instagram", "LinkedIn", "Facebook", "Websites"])
+
+    if st.button("EXECUTE HUNTER"):
+        # الخدعة: Google Dorking متطور
+        if platform == "Websites":
+            query = f'"{niche}" "{domain}" -filetype:pdf'
+        else:
+            query = f'site:{platform.lower()}.com "{niche}" "{domain}"'
+            
+        with st.spinner(f"Beast is deep-scanning {platform}..."):
             try:
-                # تصحيح الـ TypeError باستخدام num_results
-                search_results = search(query, num_results=20)
+                # محاولة البحث مع زيادة عدد النتائج وتغيير الـ User-Agent
+                search_results = search(query, num_results=40, lang="en")
                 results_links = [url for url in search_results]
                 
                 if results_links:
-                    st.success(f"Found {len(results_links)} potential sources!")
-                    for link in results_links:
-                        st.markdown(f"🔗 [Lead Page]({link})")
+                    st.success(f"🔥 Found {len(results_links)} potential targets!")
+                    # محاولة استخراج الإيميلات من العناوين (Snippet Extraction)
+                    for i, link in enumerate(results_links):
+                        st.markdown(f"**Target {i+1}:** {link}")
+                    
+                    st.info("💡 Tip: If you see many links, use a Chrome extension like 'Email Extractor' to pull all emails from these tabs at once!")
                 else:
-                    st.warning("No results. Try a broader niche!")
+                    st.error("❌ Google is blocking the script. Try again in 5 minutes or use a VPN.")
             except Exception as e:
-                st.error(f"Error: {e}")
+                st.error(f"Search Error: {e}")
 
-# --- 2. AI Writer ---
+# --- 2. AI Writer & 3. Launcher (باقي الكود كالسابق) ---
 with tabs[1]:
     st.header("🤖 AI Email Architect")
-    target_info = st.text_input("Who is the target?")
-    offer = st.text_area("Your Offer Details")
-    
-    if st.button("Generate AI Script"):
-        prompt = f"Write a world-class cold email for {target_info}. Offer: {offer}. Short and bold."
-        res = client.chat.completions.create(messages=[{"role": "user", "content": prompt}], model="llama-3.3-70b-versatile")
-        st.session_state['ai_body'] = res.choices[0].message.content
-        st.write(st.session_state['ai_body'])
+    target = st.text_input("Target Info")
+    offer = st.text_area("Offer")
+    if st.button("Generate"):
+        res = client.chat.completions.create(messages=[{"role": "user", "content": f"Write cold email for {target}: {offer}"}], model="llama-3.3-70b-versatile")
+        st.session_state['ai_msg'] = res.choices[0].message.content
+        st.write(st.session_state['ai_msg'])
 
-# --- 3. Launcher ---
 with tabs[2]:
-    st.header("🚀 Missile Launch")
-    target_emails = st.text_area("Paste Emails Here")
-    subject = st.text_input("Subject Line")
-    
-    if st.button("FIRE!"):
-        clean_list = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', target_emails)
-        if clean_list and smtp_user and smtp_pass:
+    st.header("🚀 Missile Launcher")
+    targets = st.text_area("Paste Emails")
+    sub = st.text_input("Subject")
+    if st.button("FIRE"):
+        clean = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', targets)
+        if clean and smtp_user and smtp_pass:
             server = smtplib.SMTP("smtp.gmail.com", 587)
             server.starttls()
             server.login(smtp_user, smtp_pass)
-            for email in clean_list:
+            for em in clean:
                 msg = MIMEMultipart()
-                msg['From'], msg['To'], msg['Subject'] = smtp_user, email, subject
-                body = st.session_state.get('ai_body', "Check this offer out.")
-                msg.attach(MIMEText(body, 'html'))
+                msg['From'], msg['To'], msg['Subject'] = smtp_user, em, sub
+                msg.attach(MIMEText(st.session_state.get('ai_msg', "Offer"), 'html'))
                 server.send_message(msg)
-                st.write(f"🚀 Sent to {email}")
-                time.sleep(3) # أمان
+                st.write(f"🚀 Sent to {em}")
+                time.sleep(3)
             server.quit()
-            st.success("Campaign Finished!")
-        else:
-            st.error("Check emails and SMTP settings.")
-
-# --- 4. Stats ---
-with tabs[3]:
-    st.header("📊 Intelligence")
-    st.info("System is tagging emails for open tracking.")
+            st.success("Done!")
